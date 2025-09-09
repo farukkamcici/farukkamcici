@@ -1,5 +1,5 @@
 <h1 align="center">Hi 👋, I'm Faruk</h1>
-<h3 align="center">A passionate junior data engineer from Türkiye 🇹🇷</h3>
+<h3 align="center">A junior data engineer from Türkiye 🇹🇷</h3>
 
 - 🌱 I’m currently learning **dbt,data visualization and advanced data modeling**
 
