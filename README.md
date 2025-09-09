@@ -7,7 +7,7 @@
 
 - 📫 How to reach me **farukkamcici@gmail.com**
 
-- ⚡ Fun fact **basketbal crazy 🏀**
+- ⚡ Fun fact **basketbal maniac 🏀**
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
