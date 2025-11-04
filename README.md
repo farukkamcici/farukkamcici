@@ -1,4 +1,4 @@
-# 💫 About Me:
+#  About Me:
 👋 Hi, I'm Faruk Kamçıcı<br><br>🎯 Currently working on a Public Transportation Usage Prediction Platform for Istanbul.<br>🧠 Learning LightGBM, Machine Learning, and various modeling techniques.<br>📫 Contact me: farukkamcici@gmail.com<br><br>🏀 Fun fact: basketball maniac
 
 
