@@ -26,6 +26,4 @@ jobs:
       - name: Commit outputs
         run: |
           git config --local user.name "github-actions"
-          git add dist/
-          git commit -m "Update snake"
-          git push
+          git add dist/ it diff --staged --quiet || (git commit -m "Update snake" && git push)
