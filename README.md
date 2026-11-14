@@ -1,26 +1,12 @@
-# Hi, I'm Faruk Kamçıcı
+<img alt="Faruk Kamçıcı. I turn data into apps, maps and small tools. The sky follows Istanbul's real time and weather, and my agent bros huddle in the corner, stepping out now and then to act out a short scene." src="./dist/sky.svg" width="100%" />
 
-Data engineer based in Istanbul, working at a Microsoft partner consultancy on enterprise data platforms.
-
-My day job is pipelines and dimensional models on Microsoft Fabric and the Azure data stack, mostly over SAP and production systems, plus the Power BI models that sit on top of them. PySpark on lakehouses, incremental loads and backfills on tables above 100 million rows, and making slow pipelines fast.
-
-Outside work I build data products end to end: ingestion, warehouse, transformation, API, and a front end someone can actually open.
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/farukkamcici)
-[![Portfolio](https://img.shields.io/badge/Portfolio-000000?style=for-the-badge)](https://farukkamcici.me)
-[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:farukkamcici@gmail.com)
-
-## Also Into
-
-Basketball, football data, and finance. Most of my side projects start because I wanted to look at data nobody had put on a map or a chart yet.
-
-## GitHub Stats
+Most of my side projects start with data nobody had put on a map or a screen yet. I take it the whole way, from collecting it to the app you actually open, and lately I build with a crew of AI agents.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./dist/github-snake-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="./dist/github-snake.svg" />
-  <img alt="GitHub Contribution Snake" src="./dist/github-snake.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./dist/stats-dark.svg" />
+  <img alt="My GitHub contributions by year, commits by hour of day with the share co-written with AI agents, stars by month, and a small crew of agents in the corner." src="./dist/stats-light.svg" width="100%" />
 </picture>
 
-![](https://nirzak-streak-stats.vercel.app/?user=farukkamcici&theme=calm&hide_border=true)<br/>
-![](https://github-readme-stats.vercel.app/api/top-langs/?username=farukkamcici&theme=calm&hide_border=true&include_all_commits=true&count_private=false&layout=compact&hide=html,css,scss,dockerfile,makefile,shell)
+**Things I made:** [mectrics](https://github.com/farukkamcici/mectrics), a small private system monitor for the Mac menu bar. [DoluMu](https://www.dolumu.app), how crowded your metro is right now. [Handlez](https://handlez.app), NBA numbers with a fantasy edge.
+
+<sub>Say hi on [LinkedIn](https://linkedin.com/in/farukkamcici), at [farukkamcici.me](https://farukkamcici.me) or by [email](mailto:farukkamcici@gmail.com).</sub>
