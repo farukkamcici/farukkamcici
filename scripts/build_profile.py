@@ -168,7 +168,7 @@ def sky(data):
             f'<text x="106" y="0" class="meta">Building Handlez with my agent bros</text></g>')
     weather_txt = (f'<text x="{ox - 34}" y="{oy + 2}" text-anchor="end" class="temp">{temp.rstrip(", ")}</text>'
                    f'<text x="{ox - 34}" y="{oy + 20}" text-anchor="end" class="cond">{cond}</text>')
-    crew_css, crew_svg = crew(data)
+    crew_css, crew_svg = crew(data, {"night": kind == "night", "moon": (ox, oy), "top": stops[0]})
     grad = "".join(f'<stop offset="{i / (len(stops) - 1):.2f}" stop-color="{c}"/>' for i, c in enumerate(stops))
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="Faruk Kamçıcı. I turn data into apps, maps and small tools. Istanbul, {temp}{cond}. My agent bros huddle in the corner and now and then step out to talk.">
 <defs>
@@ -195,7 +195,7 @@ def sky(data):
 </style>
 <g clip-path="url(#c)">
 <rect width="{W}" height="{H}" fill="url(#g)"/>
-{stars}{orb}{clouds}{fx}
+{stars}<g class="moonfx">{orb}</g>{clouds}{fx}
 <text x="38" y="72" class="name">Faruk Kamçıcı</text>
 <text x="40" y="104" class="sub">I turn data into apps, maps and small tools.</text>
 {meta}{weather_txt}
@@ -412,7 +412,8 @@ def agent(acc, c, i):
     return body + pills
 
 
-def crew(data):
+def crew(data, ctx=None):
+    ctx = ctx or {}
     n = len(CREW)
     name, lines = scene_for(data)
     # where they live: a small tight cluster in the bottom-right corner
@@ -433,7 +434,24 @@ def crew(data):
     D, typing = 2.9, .75
     t_end = t_talk + len(lines) * D
     t_back0, t_back1, late = t_end + .4, t_end + 2.2, 1.1
-    L = t_back1 + late + 3.0
+    # the sneak: once everyone is home, one of them slips out, edits the card
+    # without a word, and hurries back. The edit stays until the loop restarts.
+    if os.environ.get("FORCE_SNEAK"):  # previews only
+        sneak = os.environ["FORCE_SNEAK"]
+    elif ctx.get("night"):
+        sneak = "moon"
+    else:
+        sneak = ["bros", "crown"][(NOW.timetuple().tm_yday * 12 + NOW.hour // 2) % 2]
+    sneaker, target = {
+        "bros": (DOCS, (414, 166)),
+        "crown": (INTERN, (92, 20)),
+        "moon": (INTERN, (808, 94)),
+    }[sneak]
+    s0 = t_back1 + late + 1.2
+    s_peek0, s_peek1 = s0 + 1.0, s0 + 2.4
+    s_arrive, s_fix = s0 + 3.3, s0 + 3.7
+    s_leave, s_home = s0 + 4.6, s0 + 5.6
+    L = s_home + 3.0
     pct = lambda t: f"{100 * t / L:.2f}%"
     late_one = (NOW.timetuple().tm_yday + NOW.hour) % n
 
@@ -445,7 +463,14 @@ def crew(data):
         b0, b1 = t_back0 + stagger, t_back1 + stagger + (late if i == late_one else 0)
         H = f"transform:translate({hx:.1f}px,{hy:.1f}px) scale({home_s})"
         S = f"transform:translate({sx:.1f}px,{sy:.1f}px) scale({stage_s})"
-        styles.append(f"@keyframes a{i}{{0%,{pct(t_out0 + stagger)}{{{H}}}{pct(t_out1 + stagger)},{pct(b0)}{{{S}}}{pct(b1)},100%{{{H}}}}}"
+        tail = f"{pct(b1)},100%{{{H}}}"
+        if i == sneaker:
+            hx2, hy2 = home[i]
+            px, py = hx2 + .35 * (target[0] - hx2), hy2 + .35 * (target[1] - hy2)
+            P = f"transform:translate({px:.1f}px,{py:.1f}px) scale(.7)"
+            T = f"transform:translate({target[0]}px,{target[1]}px) scale(.7)"
+            tail = f"{pct(b1)},{pct(s0)}{{{H}}}{pct(s_peek0)},{pct(s_peek1)}{{{P}}}{pct(s_arrive)},{pct(s_leave)}{{{T}}}{pct(s_home)},100%{{{H}}}"
+        styles.append(f"@keyframes a{i}{{0%,{pct(t_out0 + stagger)}{{{H}}}{pct(t_out1 + stagger)},{pct(b0)}{{{S}}}{tail}}}"
                       f".a{i}{{{H};animation:a{i} {L:.1f}s cubic-bezier(.6,0,.2,1) infinite}}")
         # glances: everyone looks at whoever is talking; the speaker looks out at the visitor
         g_stops = ["0%{transform:none}", f"{pct(t_talk - .2)}{{transform:none}}"]
@@ -467,7 +492,11 @@ def crew(data):
                 m = math.hypot(vx, vy) or 1
                 dx, dy = 2.4 * vx / m, 1.6 * vy / m
             g_stops.append(f"{pct(t0 + .15)},{pct(t1 - .1)}{{transform:translate({dx:.1f}px,{dy:.1f}px)}}")
-        g_stops.append(f"{pct(t_end + .2)},100%{{transform:none}}")
+        g_stops.append(f"{pct(t_end + .2)}{{transform:none}}")
+        if i == sneaker:  # a careful look around before going for it
+            g_stops.append(f"{pct(s_peek0 + .1)}{{transform:none}}{pct(s_peek0 + .35)},{pct(s_peek0 + .7)}{{transform:translateX(-2.6px)}}"
+                           f"{pct(s_peek0 + .95)},{pct(s_peek1 - .2)}{{transform:translateX(2.6px)}}{pct(s_peek1)}{{transform:none}}")
+        g_stops.append("100%{transform:none}")
         hop.append("100%{transform:none}")
         styles.append(f"@keyframes g{i}{{{''.join(g_stops)}}}.gz{i}{{animation:g{i} {L:.1f}s ease-in-out infinite}}")
         styles.append(f"@keyframes h{i}{{{''.join(hop)}}}.h{i}{{animation:h{i} {L:.1f}s linear infinite}}")
@@ -489,12 +518,50 @@ def crew(data):
         bubbles.append(f'<g class="b{k}"><rect x="{bx:.1f}" y="{by:.1f}" width="{w:.1f}" height="24" rx="12" fill="#FFFFFF"/>{tail}'
                        f'<text x="{bx + w / 2:.1f}" y="{by + 16.5:.1f}" text-anchor="middle" class="say d{k}">• • •</text>'
                        f'<text x="{bx + w / 2:.1f}" y="{by + 16.5:.1f}" text-anchor="middle" class="say x{k}">{escape(text)}</text></g>')
+    col = CREW[sneaker][1]
+    # doodles: drawn on with the pen (pathLength=1), never popped in
+    draw = (f"@keyframes dr{{0%,{pct(s_fix)}{{stroke-dashoffset:1}}{pct(s_fix + 1.0)},100%{{stroke-dashoffset:0}}}}"
+            f".dr{{stroke-dasharray:1;stroke-dashoffset:1;animation:dr {L:.1f}s cubic-bezier(.45,.05,.35,1) infinite}}"
+            f"@keyframes fxo{{0%,{pct(s_fix)}{{opacity:1}}{pct(L - 1.1)}{{opacity:1}}{pct(L - .3)},100%{{opacity:0}}}}.fx{{animation:fxo {L:.1f}s linear infinite}}")
+    pen = Pen(97)
+
+    def doodle(pts, w=2.2, rough=.9):
+        out = []
+        for k in range(2):
+            p = [(x + pen.j(rough), y + pen.j(rough)) for x, y in pts]
+            d = "M" + " ".join(f"{x:.1f},{y:.1f}" for x, y in p)
+            out.append(f'<path class="dr" pathLength="1" d="{d}" fill="none" stroke="{col}" stroke-width="{w if k == 0 else w * .6:.1f}" '
+                       f'stroke-linecap="round" stroke-linejoin="round" opacity="{1 if k == 0 else .6}"/>')
+        return "".join(out)
+
+    if sneak == "bros":  # 'agent bros' sits at x 314..384 on the bottom line (Bricolage 14px)
+        # a real cross-out: there and back over the word, a little loose
+        zig = [(311, 191)]
+        for k, x in enumerate(range(315, 389, 5)):
+            zig.append((x, 186 if k % 2 else 195))
+        for k, x in enumerate(range(386, 312, -6)):
+            zig.append((x, 188 if k % 2 else 193.5))
+        with open(os.path.join(ROOT, "assets", "fonts", "caveat-note.ttf"), "rb") as f:
+            note_font = base64.b64encode(f.read()).decode()
+        styles.append(draw + f"@font-face{{font-family:Note;src:url(data:font/ttf;base64,{note_font}) format('truetype')}}"
+                      f"@keyframes wr{{0%,{pct(s_fix + .7)}{{clip-path:inset(-10px 100% -10px -4px)}}{pct(s_fix + 1.9)},100%{{clip-path:inset(-10px -4px -10px -4px)}}}}"
+                      f".wr{{font:700 21px Note, 'Segoe Print', cursive;clip-path:inset(-10px 100% -10px -4px);animation:wr {L:.1f}s linear infinite}}")
+        effect = (f'<g class="fx">{doodle(zig, 1.6, .5)}'
+                  f'<text x="320" y="174" class="wr" fill="{col}" transform="rotate(-5 320 174)">coworkers</text></g>')
+    elif sneak == "crown":  # a crown doodled on the F of the name
+        crown = [(40, 33), (42, 20), (48, 28), (53, 15), (58, 28), (64, 20), (66, 33), (40, 33)]
+        styles.append(draw)
+        effect = f'<g class="fx" transform="rotate(-10 53 26)">{doodle(crown, 2.3, .6)}{doodle([(53, 10), (53.5, 10.5)], 3, .1)}</g>'
+    else:  # lights out on the moon
+        styles.append(f"@keyframes mo{{0%,{pct(s_fix)}{{opacity:1}}{pct(s_fix + .2)},{pct(L - .5)}{{opacity:.12}}100%{{opacity:1}}}}"
+                      f".moonfx{{animation:mo {L:.1f}s steps(1,end) infinite}}")
+        effect = ""
     css = ("".join(styles) +
            ".blink .eye{transform-box:fill-box;transform-origin:center;animation:eye 5s infinite;animation-delay:var(--d)}"
            "@keyframes eye{0%,93%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}"
            ".scan{animation:scan 2.2s ease-in-out infinite alternate}@keyframes scan{to{transform:translateX(24px)}}"
-           f".say{{font:500 12.5px {FONT};fill:#1F2328}}")
-    return css, "".join(figs) + "".join(bubbles)
+           f".say{{font:500 12.5px {FONT};fill:#1F2328}}.edit{{font:500 14px {FONT}}}")
+    return css, effect + "".join(figs) + "".join(bubbles)
 
 
 def stats(data, theme):
