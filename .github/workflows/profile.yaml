@@ -2,7 +2,9 @@ name: Redraw profile
 
 on:
   schedule:
-    - cron: "17 */2 * * *" # every 2 hours, so the sky keeps up with Istanbul
+    # GitHub drops or delays scheduled runs on quiet repos, so this is only a
+    # fallback; my Mac also dispatches this workflow every hour (launchd).
+    - cron: "37 * * * *"
   workflow_dispatch:
   push:
     branches: [main]
