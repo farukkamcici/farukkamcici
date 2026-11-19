@@ -1,7 +1,7 @@
 {
  "weather": {
-  "temp": 17,
-  "kind": "clouds"
+  "temp": 19,
+  "kind": "clear"
  },
  "stars": {
   "total": 166,
